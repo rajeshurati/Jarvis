@@ -1,0 +1,129 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "local-jarvis"
+version = "0.18.0"
+description = "A privacy-first, local AI desktop assistant."
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = { file = "LICENSE" }
+authors = [{ name = "Local Jarvis contributors" }]
+dependencies = [
+  "fastapi>=0.116,<1",
+  "pydantic-settings>=2.10,<3",
+  "python-json-logger>=3.3,<4",
+  "uvicorn[standard]>=0.35,<1",
+]
+
+[project.optional-dependencies]
+voice = [
+  "faster-whisper>=1.2,<2",
+  "numpy>=2.2,<3",
+  "openwakeword>=0.6,<1",
+  "piper-tts>=1.6,<2",
+  "python-multipart>=0.0.20,<1",
+  "sounddevice>=0.5,<1",
+]
+vision = [
+  "insightface>=1.0.1,<2",
+  "mss>=10,<11",
+  "opencv-python>=4.10,<5",
+  "rapidocr>=3,<4",
+  "ultralytics>=8.3,<9",
+]
+documents = [
+  "openpyxl>=3.1,<4",
+  "pypdf>=6.10,<7",
+  "python-docx>=1.2,<2",
+  "python-pptx>=1.0,<2",
+]
+automation = [
+  "pyautogui>=0.9.54,<1",
+  "send2trash>=1.8,<2",
+]
+desktop = [
+  "PySide6>=6.9,<7",
+]
+gmail = [
+  "google-api-python-client>=2.170,<3",
+  "google-auth-oauthlib>=1.2,<2",
+]
+dev = [
+  "httpx>=0.28,<1",
+  "mypy>=1.17,<2",
+  "pytest>=8.4,<9",
+  "pytest-cov>=6.2,<7",
+  "ruff>=0.12,<1",
+]
+all = [
+  "local-jarvis[voice]",
+  "local-jarvis[vision]",
+  "local-jarvis[documents]",
+  "local-jarvis[automation]",
+  "local-jarvis[desktop]",
+  "local-jarvis[gmail]",
+]
+
+[project.scripts]
+jarvis = "jarvis.main:run"
+jarvis-supervisor = "jarvis.supervisor:run"
+jarvis-desktop = "jarvis.desktop:run"
+jarvis-google-auth = "jarvis.google_auth:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jarvis"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --strict-config -q"
+testpaths = ["tests"]
+filterwarnings = [
+  "ignore:Using `httpx` with `starlette.testclient` is deprecated:starlette.exceptions.StarletteDeprecationWarning",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["jarvis"]
+omit = [
+  "src/jarvis/adapters/audio/sounddevice_recorder.py",
+  "src/jarvis/adapters/automation/windows_desktop.py",
+  "src/jarvis/adapters/automation/windows_system.py",
+  "src/jarvis/adapters/language/ollama_client.py",
+  "src/jarvis/adapters/language/ollama_vision.py",
+  "src/jarvis/adapters/identity/insightface_engine.py",
+  "src/jarvis/adapters/identity/opencv_camera.py",
+  "src/jarvis/adapters/vision/mss_capture.py",
+  "src/jarvis/adapters/vision/ultralytics_detector.py",
+  "src/jarvis/adapters/vision/yolo_worker.py",
+  "src/jarvis/adapters/speech/openwakeword_detector.py",
+  "src/jarvis/adapters/speech/piper_synthesizer.py",
+  "src/jarvis/adapters/speech/faster_whisper.py",
+  "src/jarvis/main.py",
+  "src/jarvis/desktop.py",
+  "src/jarvis/native_voice.py",
+]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/jarvis/api/routes/wake.py" = ["E501"] # Embedded browser JavaScript.
+"src/jarvis/api/routes/control.py" = ["E501"] # Embedded localhost control center.
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["jarvis"]
+
+[[tool.mypy.overrides]]
+module = ["cv2", "faster_whisper", "insightface", "insightface.*", "mss", "openpyxl", "openpyxl.*", "openwakeword", "openwakeword.*", "piper", "pptx", "pptx.*", "pyautogui", "PySide6", "PySide6.*", "send2trash", "sounddevice"]
+ignore_missing_imports = true

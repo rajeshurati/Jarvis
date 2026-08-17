@@ -1,0 +1,51 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# JavaScript
+node_modules/
+.next/
+.nuxt/
+dist/
+build/
+coverage/
+.npm/
+.yarn/
+
+# Python
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+.cache/
+
+# Large archives
+*.zip
+*.rar
+*.7z
+data/pytest-*/
+
+models/*
+!models/.gitkeep
+data/*
+!data/.gitkeep
+logs/*
+!logs/.gitkeep
+
+tools/ollama/
